@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Covid 19 API</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css">
+</head>
+    <body>
+        <div class="container">
+        <h1 class="text-center mt-5" >Covid 19 Live Data</h1>
+        <h4 class="text-center mt-1">Data that is updated multiple times a day</h4>
+        <br>
+        <br>
+            <table class="table table-hover">
+                <tr>
+                    <th>WORLD</th>
+                </tr>
+                <tr>
+                    <th class="table-info">DATE</th>
+                    <th class="table-primary">NEW CONFIRMED</th>
+                    <th class="table-primary">TOTAL CONFIRMED</th>
+                    <th class="table-success">NEW RECOVERED</th>
+                    <th class="table-success">TOTAL RECOVERED</th>
+                    <th class="table-danger">NEW DEATHS</th>
+                    <th class="table-danger">TOTAL DEATHS</th>
+                </tr>
+                    <tr id="worldData"></tr>
+            </table>
+        <br>
+        <br>
+        <br>
+        <form id="myForm">
+            <select id="selectCountry" onchange="individualCountriesData()">
+                <option>Choose a Country</option>
+            </select>
+        </form>
+        <br>
+        <table class="table table-hover">
+            <tr>
+                <th>COUNTRY</th>
+            </tr>
+            <tr>
+                <th class=table-info>DATE</th>
+                <th class=table-info>COUNTRY CODE</th>
+                <th class=table-primary>NEW CONFIRMED</th>
+                <th class=table-primary>TOTAL CONFIRMED</th>
+                <th class=table-success>NEW RECOVERED</th>
+                <th class=table-success>TOTAL RECOVERED</th>
+                <th class=table-danger>NEW DEATHS</th>
+                <th class=table-danger>TOTAL DEATHS</th>
+            </tr>
+            <tr id="countryData"></tr>
+        </table>
+        </div>
+    </body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        var worldData= ''
+        var countryData= ''
+        world()
+        worldCountries()
+        function world(){
+        var url = "https://api.covid19api.com/summary"
+        
+        $.get(url,function(worldData){
+            worldData=`
+            <td>${worldData.Global.Date}</td>
+            <td>${worldData.Global.NewConfirmed}</td>
+            <td>${worldData.Global.TotalConfirmed}</td>    
+            <td>${worldData.Global.NewRecovered}</td>
+            <td>${worldData.Global.TotalRecovered}</td>    
+            <td>${worldData.Global.NewDeaths}</td>
+            <td>${worldData.Global.TotalDeaths}</td>`
+            $("#worldData").html(worldData)
+        })
+    }
+    async function worldCountries(){
+        var url = "https://api.covid19api.com/countries"
+        $.get(url,function(countryData){
+            for(var noofCountries=0;noofCountries<=countryData.length-1;noofCountries++){
+                $("#selectCountry").append("<option value = "+countryData[noofCountries].Country+">"+countryData[noofCountries].Country+"</option>")
+            }
+        })
+    }
+    function individualCountriesData(){
+        var url = "https://api.covid19api.com/summary"
+        
+        $.get(url,function(countryData){
+            for (var count=0;count<=countryData.Countries.length;count++){
+                var selected = $("#selectCountry").find('option:selected').text()
+                if(countryData.Countries[count].Country == selected){
+                    countryData=`
+                    <td>${countryData.Countries[count].Date}</td>
+                    <td>${countryData.Countries[count].CountryCode}</td>
+                    <td>${countryData.Countries[count].NewConfirmed}</td>
+                    <td>${countryData.Countries[count].TotalConfirmed}</td>    
+                    <td>${countryData.Countries[count].NewRecovered}</td>
+                    <td>${countryData.Countries[count].TotalRecovered}</td>
+                    <td>${countryData.Countries[count].NewDeaths}</td>    
+                    <td>${countryData.Countries[count].TotalDeaths}</td>`
+                    $("#countryData").html(countryData)
+                    break;
+                }
+            }
+        })
+    }
+    </script>
+</html>
